@@ -5,6 +5,7 @@ import shutil
 import os
 import uuid
 import orm.repo.py as repo 
+import orm.esquemas as esquemas
 from sqlalchemy.orm import Session
 from orm.config.py import generador_sesion
 
@@ -92,31 +93,35 @@ def lista_alumnos(sesion:Session=Depends(generador_sesion)):
 
 
 @app.post("/alumnos")
-def guardar_alumno(alumno:AlumnoBase, parametro1:str):
-    print("Alumno a guardar:", alumno, ", parametro1:", parametro1)
+def guardar_alumno(alumno:esquemas.AlumnoBase,sesion:Session=Depends(generador_sesion)):
+    print(alumno)
+    #guardado en la base.
+    return repo.guardar_alumno(sesion,alumno)
 
-    al_nuevo = {}
-    al_nuevo["id"] = len(alumnos)
-    al_nuevo["nombre"] = alumno.nombre
-    al_nuevo["edad"] = alumno.edad
-    al_nuevo["domicilio"] = alumno.domicilio
-    al_nuevo["carrera"] = alumno.carrera
-    al_nuevo["trimestre"] = alumno.trimestre
-
-    alumnos.append(alumno)
-
-    return al_nuevo
 
 @app.put("/alumnos/{id}")
-def actualizar_alumno(id:int, alumno:AlumnoBase):
-    al_act = alumno[id]
-    al_act["nombre"] = alumno.nombre
-    al_act["edad"] = alumno.edad
-    al_act["domicilio"] = alumno.domicilio    
-    al_act["carrera"] = alumno.carrera
-    al_act["trimestre"] = alumno.trimestre   
+def actualiza_alumno(id:int,info_alumno:esquemas.AlumnoBase,sesion:Session=Depends(generador_sesion)):
+    return repo.actualiza_alumno(sesion,id,info_alumno)
 
-    return al_act
+@app.post("/alumnos/{id}/calificaciones")
+def guardar_calificacion(id_alumno:int,calificacion:esquemas.CalificacionBase,sesion:Session=Depends(generador_sesion)):
+    print(calificacion)
+    #guardado en la base.
+    return repo.guardar_calificacion(sesion,calificacion,id_alumno)
+
+@app.put("/calificaciones/{id}")
+def actualiza_calificacion(id:int,info_calificacion:esquemas.CalificacionBase,sesion:Session=Depends(generador_sesion)):
+    return repo.actualiza_calificacion(sesion,id,info_calificacion)
+
+@app.post("/alumnos/{id}/fotos")
+def guardar_foto(id_alumno:int,foto:esquemas.FotoBase,sesion:Session=Depends(generador_sesion)):
+    print(foto)
+    #guardado en la base.
+    return repo.guardar_foto(sesion,foto,id_alumno)
+
+@app.put("/fotos/{id}")
+def actualiza_foto(id:int,info_foto:esquemas.FotoBase,sesion:Session=Depends(generador_sesion)):
+    return repo.actualiza_foto(sesion,id,info_foto)
     
 @app.delete("/alumno/{id}")
 def borrar_alumno(id:int, sesion:Session=Depends(generador_sesion)):
